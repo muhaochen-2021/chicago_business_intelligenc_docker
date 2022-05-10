@@ -1,0 +1,79 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+
+version: '3'
+
+# Define services
+services:
+
+  # App Service
+  app:
+    # Configuration for building the docker image for the service
+    container_name: chicago_business_intelligence_getdata
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile1
+    ports:
+      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: unless-stopped
+    depends_on: 
+      - postgresdb # This service depends on postgres. 
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+
+  # App Service
+  app2:
+    # Configuration for building the docker image for the service
+    container_name: chicago_business_intelligence_report
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile2
+    ports:
+      - "8070:8070" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: unless-stopped
+    depends_on: 
+      - postgresdb # This service depends on postgres. 
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+
+  # Postgres Service   
+  postgresdb:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=chicago_business_intelligence
+      - PGDATA=/var/lib/postgresql/data
+      - PGPORT= 5432
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+
+  # pgadmin service
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: SuperSecret
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8085:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - "postgresdb:pgsql-server"   
+    networks:
+      - backend
+
+networks:
+  backend:  
+  
+volumes:
+  db-data:
+  pgadmin-data:

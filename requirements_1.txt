@@ -1,0 +1,10 @@
+numpy 
+pandas
+psycopg2
+requests
+tqdm
+geocoder
+xlrd
+openpyxl
+tensorflow
+sklearn

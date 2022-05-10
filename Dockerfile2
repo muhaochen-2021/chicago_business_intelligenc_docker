@@ -1,0 +1,6 @@
+FROM python:3.8
+COPY . /usr/src/mypython
+WORKDIR /usr/src/mypython
+ENTRYPOINT [ "python" ]
+RUN pip install -r requirements_1.txt
+CMD [ "./main.py" ]
